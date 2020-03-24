@@ -222,6 +222,7 @@ Table.prototype.initializeRound = function(changeDealer) {
     this.deck.shuffle();
     this.headsUp = this.playersSittingInCount === 2;
     this.playersInHandCount = 0;
+    this.public.biggestBet = 0;
 
     for (var i = 0; i < this.public.seatsCount; i++) {
       // If a player is sitting on the current seat
@@ -474,8 +475,8 @@ Table.prototype.playerPostedSmallBlind = function() {
     seat: this.public.activeSeat,
     notification: "Posted blind"
   });
-  this.public.biggestBet = 0;
-  // this.public.biggestBet < bet ? bet : this.public.biggestBet;
+  this.public.biggestBet =
+    this.public.biggestBet < bet ? bet : this.public.biggestBet;
   this.emitEvent("table-data", this.public);
   this.initializeBigBlind();
 };
