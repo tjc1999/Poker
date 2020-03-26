@@ -6,6 +6,8 @@ var express = require("express"),
   path = require("path"),
   Table = require("./poker_modules/table"),
   Player = require("./poker_modules/player");
+var session = require("express-session");
+var sharedsession = require("express-socket.io-session");
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "jade");
@@ -15,12 +17,24 @@ app.use(express.bodyParser());
 app.use(app.router);
 app.use(lessMiddleware(__dirname + "/public"));
 app.use(express.static(path.join(__dirname, "public")));
+app.set("trust proxy", 1); // trust first proxy
+var session_ = session({
+  secret: "keyboard cat",
+  resave: true,
+  saveUninitialized: true,
+  cookie: {}
+});
+app.use(session_);
 
 // Development Only
 if ("development" == app.get("env")) {
   app.use(express.errorHandler());
 }
-
+io.use(
+  sharedsession(session_, {
+    autoSave: true
+  })
+);
 var players = [];
 var tables = [];
 var eventEmitter = {};
@@ -162,6 +176,9 @@ io.sockets.on("connection", function(socket) {
    */
   socket.on("register", function(newScreenName, callback) {
     // If a new screen name is posted
+    if (socket.handshake.session.player) {
+      console.log(socket.handshake.session.player);
+    }
     if (typeof newScreenName !== "undefined") {
       var newScreenName = newScreenName.trim();
       // If the new screen name is not an empty string
@@ -178,7 +195,10 @@ io.sockets.on("connection", function(socket) {
         }
         if (!nameExists) {
           // Creating the player object
-          players[socket.id] = new Player(socket, newScreenName, 1000);
+
+          players[socket.id] = new Player(socket, newScreenName, 10000);
+          socket.handshake.session.player = "kardun";
+          socket.handshake.session.save();
           callback({
             success: true,
             screenName: newScreenName,

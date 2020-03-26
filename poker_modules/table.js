@@ -437,7 +437,7 @@ Table.prototype.showdown = function() {
   var that = this;
   setTimeout(function() {
     that.endRound();
-  }, 2000);
+  }, 6000);
 };
 
 /**
