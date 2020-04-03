@@ -513,8 +513,8 @@ tables[0] = new Table(
   "Sample 10-handed Table",
   eventEmitter(0),
   10,
-  2,
-  1,
+  6,
+  3,
   10000,
   40,
   false

@@ -620,6 +620,8 @@ Table.prototype.playerRaised = function(amount) {
     this.public.biggestBet < this.seats[this.public.activeSeat].public.bet
       ? this.seats[this.public.activeSeat].public.bet
       : this.public.biggestBet;
+  console.log(this.public.biggestBet);
+  console.log(oldBiggestBet);
   var raiseAmount = this.public.biggestBet - oldBiggestBet;
   this.log({
     message:
