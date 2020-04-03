@@ -591,11 +591,12 @@ Table.prototype.playerCalled = function() {
  */
 Table.prototype.playerBetted = function(amount) {
   this.seats[this.public.activeSeat].bet(amount);
+  var oldBiggestBet = this.public.biggestBet;
   this.public.biggestBet =
     this.public.biggestBet < this.seats[this.public.activeSeat].public.bet
       ? this.seats[this.public.activeSeat].public.bet
       : this.public.biggestBet;
-  this.public.lastRaise = this.public.biggestBet
+  this.public.lastRaise = this.public.biggestBet - oldBiggestBet;
 
   this.log({
     message:
