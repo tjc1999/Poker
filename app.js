@@ -468,6 +468,42 @@ io.sockets.on("connection", function(socket) {
   });
 
   /**
+   * When a player goes all in
+   * @param function callback
+   */
+  socket.on("allin", function(callback) {
+    if (players[socket.id].sittingOnTable !== "undefined") {
+      var tableId = players[socket.id].sittingOnTable;
+      var activeSeat = tables[tableId].public.activeSeat;
+
+      if (
+        // The table exists
+        typeof tables[tableId] !== "undefined" &&
+        // The player who should act is the player who raised
+        tables[tableId].seats[activeSeat].socket.id === socket.id &&
+        // It's not a round of blinds
+        ["preflop", "flop", "turn", "river"].indexOf(
+          tables[tableId].public.phase
+        ) > -1 &&
+        // Not every other player is all in (in which case the only move is "call")
+        !tables[tableId].otherPlayersAreAllIn()
+      ) {
+        amount = tables[tableId].seats[activeSeat].public.chipsInPlay;
+        if (amount && isFinite(amount)) {
+          // Sending the callback first, because the next functions may need to send data to the same player, that shouldn't be overwritten
+          callback({ success: true });
+          if (tables[tableId].public.biggestBet) {
+            tables[tableId].playerRaised(amount);
+          } else {
+            tables[tableId].playerBetted(amount);
+          }
+        }
+      }
+    }
+  });
+
+
+  /**
    * When a message from a player is sent
    * @param string message
    */

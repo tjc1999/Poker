@@ -88,6 +88,10 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 		return $scope.actionState === "actBettedPot" && $scope.table.seats[$scope.mySeat].chipsInPlay && $scope.table.biggestBet < $scope.table.seats[$scope.mySeat].chipsInPlay;
 	}
 
+	$scope.showAllInButton = function() {
+		return ($scope.actionState === "actNotBettedPot" || $scope.actionState === "actBettedPot") && $scope.table.seats[$scope.mySeat].chipsInPlay && $scope.table.biggestBet < $scope.table.seats[$scope.mySeat].chipsInPlay;
+	}
+
 	$scope.showBetRange = function() {
 		return ($scope.actionState === "actNotBettedPot" || $scope.actionState === "actBettedPot") && $scope.table.seats[$scope.mySeat].chipsInPlay && $scope.table.biggestBet < $scope.table.seats[$scope.mySeat].chipsInPlay;
 	}
@@ -241,6 +245,18 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 				$scope.$digest();
 			}
 		});
+	}
+
+	$scope.allin = function() {
+		if (window.confirm("Mikhay goh bokhori?!")) {
+			socket.emit( 'allin', function( response ) {
+				if( response.success ) {
+					sounds.playRaiseSound();
+					$scope.actionState = '';
+					$scope.$digest();
+				}
+			});
+		}
 	}
 
 	// When the table data have changed

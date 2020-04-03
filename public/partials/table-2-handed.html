@@ -86,6 +86,9 @@
 			<button class="control-button" ng-click="bet()" ng-show="showBetButton()">Bet {{betAmount}}</button>
 			<button class="control-button" ng-click="raise()" ng-show="showRaiseButton()">Raise to {{betAmount}}</button>
 		</div>
+		<div class="cell">
+			<button class="control-button" ng-click="allin()" ng-show="showAllInButton()">All-In {{maxBetAmount()}}</button>
+		</div>
 		<div class="double-cell">
 			<div class="cell-content">
 				<input type="range" ng-show="showBetRange()" min="{{minBetAmount()}}" max="{{maxBetAmount()}}" ng-model="betAmount">
