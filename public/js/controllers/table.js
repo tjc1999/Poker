@@ -37,7 +37,8 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 		if( $scope.mySeat === null || typeof $scope.table.seats[$scope.mySeat] === 'undefined' || $scope.table.seats[$scope.mySeat] === null ) return 0;
 		// If the pot was raised
 		if( $scope.actionState === "actBettedPot" ) {
-			var proposedBet = +$scope.table.biggestBet + $scope.table.bigBlind;
+			var minRaise = $scope.table.lastRaise < $scope.table.bigBlind ? $scope.table.bigBlind: $scope.table.lastRaise;
+			var proposedBet = +$scope.table.biggestBet + minRaise;
 			return $scope.table.seats[$scope.mySeat].chipsInPlay < proposedBet ? $scope.table.seats[$scope.mySeat].chipsInPlay : proposedBet;
 		} else {
 			return $scope.table.seats[$scope.mySeat].chipsInPlay < $scope.table.bigBlind ? $scope.table.seats[$scope.mySeat].chipsInPlay : $scope.table.bigBlind;

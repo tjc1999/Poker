@@ -67,6 +67,8 @@ var Table = function(
     pot: this.pot.pots,
     // The biggest bet of the table in the current phase
     biggestBet: 0,
+    // The last raise in the current phase
+    lastRaise: 0,
     // The seat of the dealer
     dealerSeat: null,
     // The seat of the active player
@@ -223,6 +225,7 @@ Table.prototype.initializeRound = function(changeDealer) {
     this.headsUp = this.playersSittingInCount === 2;
     this.playersInHandCount = 0;
     this.public.biggestBet = 0;
+    this.public.lastRaise = 0;
 
     for (var i = 0; i < this.public.seatsCount; i++) {
       // If a player is sitting on the current seat
@@ -344,7 +347,9 @@ Table.prototype.initializeNextPhase = function() {
   });
   this.pot.addTableBets(this.seats);
   this.public.biggestBet = 0;
+  this.public.lastRaise = 0;
   console.log(this.public.biggestBet);
+  console.log(this.public.lastRaise);
   this.public.activeSeat = this.findNextPlayer(this.public.dealerSeat);
   this.lastPlayerToAct = this.findPreviousPlayer(this.public.activeSeat);
   this.emitEvent("table-data", this.public);
@@ -590,6 +595,7 @@ Table.prototype.playerBetted = function(amount) {
     this.public.biggestBet < this.seats[this.public.activeSeat].public.bet
       ? this.seats[this.public.activeSeat].public.bet
       : this.public.biggestBet;
+  this.public.lastRaise = this.public.biggestBet
 
   this.log({
     message:
@@ -622,7 +628,7 @@ Table.prototype.playerRaised = function(amount) {
       : this.public.biggestBet;
   console.log(this.public.biggestBet);
   console.log(oldBiggestBet);
-  var raiseAmount = this.public.biggestBet - oldBiggestBet;
+  this.public.lastRaise = this.public.biggestBet - oldBiggestBet;
   this.log({
     message:
       this.seats[this.public.activeSeat].public.name +
@@ -630,7 +636,7 @@ Table.prototype.playerRaised = function(amount) {
       this.public.biggestBet,
     action: "raise",
     seat: this.public.activeSeat,
-    notification: "Raise " + raiseAmount
+    notification: "Raise " + this.public.lastRaise
   });
   this.emitEvent("table-data", this.public);
 
