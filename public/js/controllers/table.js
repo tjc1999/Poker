@@ -340,6 +340,7 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 	socket.on( 'gameStopped', function( data ) {
 		$scope.table = data;
 		$scope.actionState = 'waiting';
+		$scope.clearActionReminder();
 		$scope.$digest();
 	});
 
