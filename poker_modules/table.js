@@ -348,9 +348,10 @@ Table.prototype.initializeNextPhase = function() {
   this.pot.addTableBets(this.seats);
   this.public.biggestBet = 0;
   this.public.lastRaise = 0;
-  console.log(this.public.biggestBet);
-  console.log(this.public.lastRaise);
-  this.public.activeSeat = this.findNextPlayer(this.public.dealerSeat);
+  this.public.activeSeat = this.findNextPlayer(this.public.dealerSeat, [
+    "chipsInPlay",
+    "inHand"
+  ]);
   this.lastPlayerToAct = this.findPreviousPlayer(this.public.activeSeat);
   this.emitEvent("table-data", this.public);
 
@@ -369,10 +370,23 @@ Table.prototype.initializeNextPhase = function() {
  * Making the next player the active one
  */
 Table.prototype.actionToNextPlayer = function() {
+  var oldActiveSeat = this.public.activeSeat;
   this.public.activeSeat = this.findNextPlayer(this.public.activeSeat, [
     "chipsInPlay",
     "inHand"
   ]);
+
+  if (this.lastPlayerToAct < 10) {
+    if ((oldActiveSeat < this.lastPlayerToAct &&
+         this.lastPlayerToAct < this.public.activeSeat) ||
+        (this.public.activeSeat < oldActiveSeat &&
+         oldActiveSeat < this.lastPlayerToAct) ||
+        (this.lastPlayerToAct < this.public.activeSeat &&
+         this.public.activeSeat < oldActiveSeat)) {
+      this.endPhase();
+      return;
+    }
+  }
 
   switch (this.public.phase) {
     case "smallBlind":
@@ -627,8 +641,6 @@ Table.prototype.playerRaised = function(amount) {
     this.public.biggestBet < this.seats[this.public.activeSeat].public.bet
       ? this.seats[this.public.activeSeat].public.bet
       : this.public.biggestBet;
-  console.log(this.public.biggestBet);
-  console.log(oldBiggestBet);
   this.public.lastRaise = this.public.biggestBet - oldBiggestBet;
   this.log({
     message:

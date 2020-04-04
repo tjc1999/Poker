@@ -36,11 +36,14 @@ Pot.prototype.addTableBets = function(players) {
   var smallestBet = 0;
   // Flag that shows if all the bets have the same amount
   var allBetsAreEqual = true;
+  // Number of contributers in this round
+  var numContributors = 0;
 
   // Trying to find the smallest bet of the player
   // and if all the bets are equal
   for (var i in players) {
     if (players[i] && players[i].public.bet) {
+      numContributors += 1;
       if (!smallestBet) {
         smallestBet = players[i].public.bet;
       } else if (players[i].public.bet != smallestBet) {
@@ -51,6 +54,16 @@ Pot.prototype.addTableBets = function(players) {
         }
       }
     }
+  }
+
+  // If the number of contributors is less than the last round, create a new empty pot
+  if (numContributors &&
+      numContributors < this.pots[currentPot].contributors.length) {
+    this.pots.push({
+      amount: 0,
+      contributors: []
+    });
+    currentPot += 1;
   }
 
   // If all the bets are equal, then remove the bets of the players and add
