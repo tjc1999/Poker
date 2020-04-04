@@ -13,6 +13,8 @@ var Deck = require("./deck"),
  * @param int 		maxBuyIn (the maximum amount of chips that one can bring to the table)
  * @param int 		minBuyIn (the minimum amount of chips that one can bring to the table)
  * @param bool 		privateTable (flag that shows whether the table will be shown in the lobby)
+ * @param int 		minActionTimeout (Maximum time in milliseconds before a player is reminded to act, set to zero to disable)
+ * @param int 		maxActionTimeout (Minimum time in milliseconds before a player is reminded to act)
  */
 var Table = function(
   id,
@@ -23,7 +25,9 @@ var Table = function(
   smallBlind,
   maxBuyIn,
   minBuyIn,
-  privateTable
+  privateTable,
+  minActionTimeout,
+  maxActionTimeout
 ) {
   // The table is not displayed in the lobby
   this.privateTable = privateTable;
@@ -63,6 +67,10 @@ var Table = function(
     minBuyIn: minBuyIn,
     // The maximum allowed buy in
     maxBuyIn: maxBuyIn,
+    // Minimum time (in milliseconds) before a player is reminded to act (set to zero to disable)
+    minActionTimeout: minActionTimeout,
+    // Maximum time (in milliseconds) before a player is reminded to act
+    maxActionTimeout: maxActionTimeout,
     // The amount of chips that are in the pot
     pot: this.pot.pots,
     // The biggest bet of the table in the current phase
@@ -348,10 +356,14 @@ Table.prototype.initializeNextPhase = function() {
   this.pot.addTableBets(this.seats);
   this.public.biggestBet = 0;
   this.public.lastRaise = 0;
-  this.public.activeSeat = this.findNextPlayer(this.public.dealerSeat, [
-    "chipsInPlay",
-    "inHand"
-  ]);
+  if (this.otherPlayersAreAllIn()) {
+    this.public.activeSeat = this.findNextPlayer(this.public.dealerSeat);
+  } else {
+    this.public.activeSeat = this.findNextPlayer(this.public.dealerSeat, [
+      "chipsInPlay",
+      "inHand"
+    ]);
+  }
   this.lastPlayerToAct = this.findPreviousPlayer(this.public.activeSeat);
   this.emitEvent("table-data", this.public);
 
@@ -590,10 +602,7 @@ Table.prototype.playerCalled = function() {
 
   this.emitEvent("table-data", this.public);
 
-  if (
-    this.lastPlayerToAct === this.public.activeSeat ||
-    this.otherPlayersAreAllIn()
-  ) {
+  if (this.lastPlayerToAct === this.public.activeSeat) {
     this.endPhase();
   } else {
     this.actionToNextPlayer();

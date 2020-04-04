@@ -471,7 +471,7 @@ io.sockets.on("connection", function(socket) {
    * When a player goes all in
    * @param function callback
    */
-  socket.on("allin", function(callback) {
+  socket.on("allIn", function(callback) {
     if (players[socket.id].sittingOnTable !== "undefined") {
       var tableId = players[socket.id].sittingOnTable;
       var activeSeat = tables[tableId].public.activeSeat;
@@ -553,7 +553,9 @@ tables[0] = new Table(
   3,
   10000,
   40,
-  false
+  false,
+  15000,
+  60000
 );
 tables[1] = new Table(
   1,
@@ -564,7 +566,9 @@ tables[1] = new Table(
   2,
   400,
   80,
-  false
+  false,
+  15000,
+  60000
 );
 tables[2] = new Table(
   2,
@@ -575,7 +579,9 @@ tables[2] = new Table(
   4,
   800,
   160,
-  false
+  false,
+  15000,
+  60000
 );
 tables[3] = new Table(
   3,
@@ -586,5 +592,7 @@ tables[3] = new Table(
   10,
   2000,
   400,
-  true
+  true,
+  15000,
+  60000
 );

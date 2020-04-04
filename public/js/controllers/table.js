@@ -14,6 +14,8 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 	$scope.myCards = ['', ''];
 	$scope.mySeat = null;
 	$scope.betAmount = 0;
+	$scope.actionTimeout = 0;
+	$scope.actionTimer = null;
 	$rootScope.sittingOnTable = null;
 	var showingNotification = false;
 
@@ -178,6 +180,7 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 				$rootScope.totalChips = response.totalChips;
 				$rootScope.sittingIn = false;
 				$scope.actionState = '';
+				$scope.clearActionReminder();
 				$rootScope.$digest();
 				$scope.$digest();
 			}
@@ -193,6 +196,7 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 				sounds.playBetSound();
 			}
 			$scope.actionState = '';
+			$scope.clearActionReminder();
 			$scope.$digest();
 		});
 	}
@@ -202,6 +206,7 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 			if( response.success ) {
 				sounds.playCheckSound();
 				$scope.actionState = '';
+				$scope.clearActionReminder();
 				$scope.$digest();
 			}
 		});
@@ -212,6 +217,7 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 			if( response.success ) {
 				sounds.playFoldSound();
 				$scope.actionState = '';
+				$scope.clearActionReminder();
 				$scope.$digest();
 			}
 		});
@@ -222,6 +228,7 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 			if( response.success ) {
 				sounds.playCallSound();
 				$scope.actionState = '';
+				$scope.clearActionReminder();
 				$scope.$digest();
 			}
 		});
@@ -232,6 +239,7 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 			if( response.success ) {
 				sounds.playBetSound();
 				$scope.actionState = '';
+				$scope.clearActionReminder();
 				$scope.$digest();
 			}
 		});
@@ -242,21 +250,47 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 			if( response.success ) {
 				sounds.playRaiseSound();
 				$scope.actionState = '';
+				$scope.clearActionReminder();
 				$scope.$digest();
 			}
 		});
 	}
 
-	$scope.allin = function() {
+	$scope.allIn = function() {
 		if (window.confirm("Mikhay goh bokhori?!")) {
-			socket.emit( 'allin', function( response ) {
+			socket.emit( 'allIn', function( response ) {
 				if( response.success ) {
 					sounds.playRaiseSound();
 					$scope.actionState = '';
+					$scope.clearActionReminder();
 					$scope.$digest();
 				}
 			});
 		}
+	}
+
+	$scope.setActionReminder = function() {
+		if ($scope.table.minActionTimeout) {
+			$scope.actionTimeout = $scope.table.minActionTimeout;
+			$scope.actionTimer = setTimeout($scope.remindAction, $scope.actionTimeout);
+		}
+	}
+
+	$scope.clearActionReminder = function() {
+		if ($scope.actionTimer !== null) {
+			clearTimeout($scope.actionTimer);
+			$scope.actionTimeout = 0;
+			$scope.actionTimer = null;
+		}
+	}
+
+	$scope.remindAction = function() {
+		sounds.playActionReminderSound();
+		$scope.actionTimeout *= 2;
+		if ($scope.actionTimeout > $scope.table.maxActionTimeout) {
+			$scope.actionTimeout = $scope.table.maxActionTimeout;
+		}
+		$scope.actionTimer = setTimeout($scope.remindAction, $scope.actionTimeout);
 	}
 
 	// When the table data have changed
@@ -312,12 +346,14 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 	// When the player is asked to place the small blind
 	socket.on( 'postSmallBlind', function( data ) {
 		$scope.actionState = 'postSmallBlind';
+		$scope.setActionReminder();
 		$scope.$digest();
 	});
 
 	// When the player is asked to place the big blind
 	socket.on( 'postBigBlind', function( data ) {
 		$scope.actionState = 'postBigBlind';
+		$scope.setActionReminder();
 		$scope.$digest();
 	});
 
@@ -335,6 +371,7 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 		var minRaise = $scope.table.lastRaise < $scope.table.bigBlind ? $scope.table.bigBlind : $scope.table.lastRaise;
 		var proposedBet = +$scope.table.biggestBet + minRaise;
 		$scope.betAmount = $scope.table.seats[$scope.mySeat].chipsInPlay < proposedBet ? $scope.table.seats[$scope.mySeat].chipsInPlay : proposedBet;
+		$scope.setActionReminder();
 		$scope.$digest();
 	});
 
@@ -343,6 +380,7 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 		$scope.actionState = 'actNotBettedPot';
 
 		$scope.betAmount = $scope.table.seats[$scope.mySeat].chipsInPlay < $scope.table.bigBlind ? $scope.table.seats[$scope.mySeat].chipsInPlay : $scope.table.bigBlind;
+		$scope.setActionReminder();
 		$scope.$digest();
 	});
 
@@ -350,6 +388,7 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 	socket.on( 'actOthersAllIn', function() {
 		$scope.actionState = 'actOthersAllIn';
 
+		$scope.setActionReminder();
 		$scope.$digest();
 	});
 }]);
