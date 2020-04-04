@@ -389,7 +389,8 @@ Table.prototype.actionToNextPlayer = function() {
   ]);
 
   if (this.lastPlayerToAct < 10) {
-    if ((oldActiveSeat < this.lastPlayerToAct &&
+    if ((oldActiveSeat == this.public.activeSeat) ||
+        (oldActiveSeat < this.lastPlayerToAct &&
          this.lastPlayerToAct < this.public.activeSeat) ||
         (this.public.activeSeat < oldActiveSeat &&
          oldActiveSeat < this.lastPlayerToAct) ||
