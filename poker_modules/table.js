@@ -388,8 +388,14 @@ Table.prototype.actionToNextPlayer = function() {
     "inHand"
   ]);
 
+  if (this.public.activeSeat === null) {
+    this.public.activeSeat = oldActiveSeat;
+    this.endPhase();
+    return;
+  }
+
   if (this.lastPlayerToAct < 10) {
-    if ((oldActiveSeat == this.public.activeSeat) ||
+    if ((oldActiveSeat === this.public.activeSeat) ||
         (oldActiveSeat < this.lastPlayerToAct &&
          this.lastPlayerToAct < this.public.activeSeat) ||
         (this.public.activeSeat < oldActiveSeat &&
