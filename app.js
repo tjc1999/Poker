@@ -543,56 +543,40 @@ function htmlEntities(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
 }
-
+/*id,
+  name,
+  eventEmitter,
+  seatsCount,
+  bigBlind,
+  smallBlind,
+  maxBuyIn,
+  minBuyIn,
+  privateTable,
+  minActionTimeout,
+  maxActionTimeout*/
 tables[0] = new Table(
   0,
-  "Sample 10-handed Table",
+  "10-handed Table A",
   eventEmitter(0),
   10,
-  6,
-  3,
+  50,
+  25,
   10000,
-  40,
-  false,
-  15000,
-  60000
-);
-tables[1] = new Table(
-  1,
-  "Sample 6-handed Table",
-  eventEmitter(1),
-  6,
-  4,
-  2,
-  400,
-  80,
-  false,
-  15000,
-  60000
-);
-tables[2] = new Table(
-  2,
-  "Sample 2-handed Table",
-  eventEmitter(2),
-  2,
-  8,
-  4,
-  800,
-  160,
-  false,
-  15000,
-  60000
-);
-tables[3] = new Table(
-  3,
-  "Sample 6-handed Private Table",
-  eventEmitter(3),
-  6,
-  20,
-  10,
   2000,
-  400,
-  true,
+  false,
   15000,
-  60000
+  120000
+);
+tables[0] = new Table(
+  0,
+  "10-handed Table B",
+  eventEmitter(0),
+  10,
+  100,
+  50,
+  10000,
+  2000,
+  false,
+  15000,
+  120000
 );
