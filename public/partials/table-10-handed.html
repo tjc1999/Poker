@@ -1,3 +1,6 @@
+<button id="increase-blind" class="button clickable" ng-click="increaseBlind()" ng-show="$root.sittingOnTable !== null">Increase Blind</button>
+<a id="to-lobby" class="button" href="/" ng-show="!$root.sittingOnTable" ng-click="leaveRoom()">Lobby</a>
+<div id="current-blinds">Current Blinds: {{table.smallBlind}}/{{table.bigBlind}}</div>
 <div id="table-wrap">
 	<div class="modal-wrap" ng-show="buyInModalVisible">
 		<div class="modal">
@@ -18,7 +21,6 @@
 	</div>
 	<div class="row">
 		<div class="cell">
-			<a id="to-lobby" class="button" href="/" ng-show="!$root.sittingOnTable" ng-click="leaveRoom()">< Lobby</a>
 			<seat player="table.seats[0]" active-seat="table.activeSeat" dealer-seat="table.dealerSeat" my-seat="mySeat" my-cards="myCards" sitting-on-table="$root.sittingOnTable" show-buy-in-modal="showBuyInModal(seat)" notifications="notifications" seat-index="0" cell-number="0" class="top left"></seat>
 		</div>
 		<div class="cell">
@@ -88,7 +90,7 @@
 		<div class="cell">
 			<button class="control-button" ng-click="fold()" ng-show="showFoldButton()">Fold</button>
 			<button class="control-button" ng-click="postBlind(false)" ng-show="actionState === 'postSmallBlind' || actionState === 'postBigBlind'">Sit Out</button>
-			<button class="control-button" ng-click="leaveTable()" ng-show="showLeaveTableButton()">Leave Table</button>
+			<button class="control-button" ng-click="leaveTable()" ng-show="showLeaveTableButton() || !player.sittingIn && actionState == ''">Leave Table</button>
 		</div>
 		<div class="cell">
 			<button class="control-button" ng-click="sitIn()" ng-show="$root.sittingOnTable !== null && !$root.sittingIn">Sit In</button>
@@ -102,7 +104,7 @@
 			<button class="control-button" ng-click="raise()" ng-show="showRaiseButton()">Raise to {{betAmount}}</button>
 		</div>
 		<div class="cell">
-			<button class="control-button" ng-click="allIn()" ng-show="showAllInButton()">All-In {{maxBetAmount()}}</button>
+			<button class="control-button" ng-click="allin()" ng-show="showAllInButton()">All-In {{maxBetAmount()}}</button>
 		</div>
 		<div class="double-cell">
 			<div class="cell-content">
@@ -117,6 +119,5 @@
 		<audio id="call-sound" src="/audio/call.wav" preload="auto">
 		<audio id="bet-sound" src="/audio/bet.wav" preload="auto">
 		<audio id="raise-sound" src="/audio/raise.wav" preload="auto">
-		<audio id="actionReminder-sound" src="/audio/actionReminder.wav" preload="auto">
 	</div>
 </div>
