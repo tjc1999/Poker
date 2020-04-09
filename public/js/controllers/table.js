@@ -26,7 +26,7 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 		method: 'GET'
 	}).success(function( data, status, headers, config ) {
 		$scope.table = data.table;
-		$scope.buyInAmount = $rootScope.totalChips; //$rootScope.totalChips
+		$scope.buyInAmount = 32000; //$rootScope.totalChips
 		$scope.betAmount = data.table.bigBlind;
 	});
 
