@@ -13,8 +13,10 @@ var Deck = require('./deck'),
  * @param int 		maxBuyIn (the maximum amount of chips that one can bring to the table)
  * @param int 		minBuyIn (the minimum amount of chips that one can bring to the table)
  * @param bool 		privateTable (flag that shows whether the table will be shown in the lobby)
+ * @param int 		minActionTimeout (Maximum time in milliseconds before a player is reminded to act, set to zero to disable)
+ * @param int 		maxActionTimeout (Minimum time in milliseconds before a player is reminded to act)
  */
-var Table = function( id, name, eventEmitter, seatsCount, bigBlind, smallBlind, maxBuyIn, minBuyIn, privateTable, blindIncreases, blindInterval ) {
+var Table = function( id, name, eventEmitter, seatsCount, bigBlind, smallBlind, maxBuyIn, minBuyIn, privateTable, blindIncreases, blindInterval, minActionTimeout, maxActionTimeout ) {
 	// The table is not displayed in the lobby
 	this.privateTable = privateTable;
 	// The number of players who receive cards at the begining of each round
@@ -59,6 +61,10 @@ var Table = function( id, name, eventEmitter, seatsCount, bigBlind, smallBlind, 
 		currentBlind: 0,
 		// Blind Increase Interval
 		blindInterval: blindInterval,
+		// Minimum time (in milliseconds) before a player is reminded to act (set to zero to disable)
+		minActionTimeout: minActionTimeout,
+		// Maximum time (in milliseconds) before a player is reminded to act
+		maxActionTimeout: maxActionTimeout,
 		// The amount of chips that are in the pot
 		pot: this.pot.pots,
 		// The biggest bet of the table in the current phase
@@ -225,7 +231,6 @@ Table.prototype.initializeRound = function( changeDealer ) {
 			// If a player is sitting on the current seat
 			if( this.seats[i] !== null && this.seats[i].public.sittingIn ) {
 				if( !this.seats[i].public.chipsInPlay ) {
-					console.log("leaveTable from table.js:228");
 					this.seats[seat].leaveTable();
 					this.playersSittingInCount--;
 				} else {
@@ -329,7 +334,14 @@ Table.prototype.initializeNextPhase = function() {
 
 	this.pot.addTableBets( this.seats );
 	this.public.biggestBet = 0;
-	this.public.activeSeat = this.findNextPlayer( this.public.dealerSeat );
+  if (this.otherPlayersAreAllIn()) {
+    this.public.activeSeat = this.findNextPlayer(this.public.dealerSeat);
+  } else {
+    this.public.activeSeat = this.findNextPlayer(this.public.dealerSeat, [
+      "chipsInPlay",
+      "inHand"
+    ]);
+  }
 	this.lastPlayerToAct = this.findPreviousPlayer( this.public.activeSeat );
 	this.emitEvent( 'table-data', this.public );
 
@@ -348,8 +360,28 @@ Table.prototype.initializeNextPhase = function() {
  * Making the next player the active one
  */
 Table.prototype.actionToNextPlayer = function() {
+	var oldActiveSeat = this.public.activeSeat;
 	this.public.activeSeat = this.findNextPlayer( this.public.activeSeat, ['chipsInPlay', 'inHand'] );
+	
+	if (this.public.activeSeat === null) {
+		this.public.activeSeat = oldActiveSeat;
+		this.endPhase();
+		return;
+	  }
 
+  if (this.lastPlayerToAct < 10) {
+	if ((oldActiveSeat === this.public.activeSeat) ||
+        (oldActiveSeat < this.lastPlayerToAct &&
+		 this.lastPlayerToAct < this.public.activeSeat) ||
+		(this.public.activeSeat < oldActiveSeat &&
+		 oldActiveSeat < this.lastPlayerToAct) ||
+		(this.lastPlayerToAct < this.public.activeSeat &&
+		 this.public.activeSeat < oldActiveSeat)) {
+	  this.endPhase();
+	  return;
+	}
+  }
+	
 	switch( this.public.phase ) {
 		case 'smallBlind':
 			this.seats[this.public.activeSeat].socket.emit( 'postSmallBlind' );
@@ -416,7 +448,7 @@ Table.prototype.showdown = function() {
 	}
 
 	var that = this;
-	var timeout = 20000;
+	var timeout = 20000; //20 seconds
 	setTimeout( function(){
 		that.endRound();
 	}, timeout );
@@ -561,7 +593,7 @@ Table.prototype.playerCalled = function() {
 
 	this.emitEvent( 'table-data', this.public );
 
-	if( this.lastPlayerToAct === this.public.activeSeat || this.otherPlayersAreAllIn() ) {
+	if( this.lastPlayerToAct === this.public.activeSeat ) {
 		this.endPhase();
 	} else {
 		this.actionToNextPlayer();
@@ -763,7 +795,6 @@ Table.prototype.playerSatOut = function( seat, playerLeft ) {
 			}
 		}
 	} else {
-		console.log("sitout tabls.js:766");
 		this.seats[seat].sitOut();
 	}
 	this.emitEvent( 'table-data', this.public );
@@ -814,7 +845,6 @@ Table.prototype.endRound = function() {
 	// Sitting out the players who don't have chips
 	for( i=0 ; i<this.public.seatsCount ; i++ ) {
 		if( this.seats[i] !== null && this.seats[i].public.chipsInPlay <=0 && this.seats[i].public.sittingIn ) {
-			console.log("sitOut from table.js:814");
 			this.seats[i].sitOut();
 			this.seats[i].cards = [];
 			this.seats[i].public.hasCards = false;

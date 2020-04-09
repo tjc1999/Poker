@@ -390,7 +390,7 @@ io.sockets.on('connection', function( socket ) {
    * When a player goes all in
    * @param function callback
    */
-  socket.on("allin", function(callback) {
+  socket.on("allIn", function(callback) {
     if (players[socket.id].sittingOnTable !== "undefined") {
       var tableId = players[socket.id].sittingOnTable;
       var activeSeat = tables[tableId].public.activeSeat;
@@ -453,5 +453,5 @@ function htmlEntities(str) {
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-tables[0] = new Table( 0, 'Tournament Table for 10', eventEmitter(0), 10, 200, 100, 640000, 100, false, [100,200,300,400,500,700,1000,1500,2000,2500,5000,10000], 10000 );
-tables[1] = new Table( 1, 'Table for 10', eventEmitter(1), 10, 200, 100, 32000, 32000, false );
+tables[0] = new Table( 0, 'Tournament Table for 10', eventEmitter(0), 10, 200, 100, 640000, 100, false, [100,200,300,400,500,700,1000,1500,2000,2500,5000,10000], 10000, 30000, 30000 );
+tables[1] = new Table( 1, 'Table for 10', eventEmitter(1), 10, 200, 100, 32000, 32000, false, 30000, 120000 );
