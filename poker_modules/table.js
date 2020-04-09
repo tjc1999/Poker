@@ -416,7 +416,7 @@ Table.prototype.showdown = function() {
 	}
 
 	var that = this;
-	var timeout = this.playersInHandCount * 2000;
+	var timeout = 20000;
 	setTimeout( function(){
 		that.endRound();
 	}, timeout );
