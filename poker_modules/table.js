@@ -774,9 +774,11 @@ Table.prototype.otherPlayersAreAllIn = function() {
 	var currentPlayer = this.public.activeSeat;
 	var playersAllIn = 0;
 	for( var i=0 ; i<this.playersInHandCount ; i++ ) {
-		if( this.seats[i].public.chipsInPlay === 0 ) {
-			playersAllIn++;
-		}
+		try{
+			if( this.seats[currentPlayer].public.chipsInPlay === 0 ) {
+				playersAllIn++;
+			}
+		}catch(e){}
 		currentPlayer = this.findNextPlayer( currentPlayer );
 	}
 
