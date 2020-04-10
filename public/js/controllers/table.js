@@ -290,7 +290,6 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 			clearTimeout($scope.actionTimer);
 			$scope.actionTimeout = 0;
 			$scope.actionTimer = null;
-			$scope.kickTimer = null;
 		}
 	}
 
@@ -300,8 +299,6 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 		if ($scope.actionTimeout > $scope.table.maxActionTimeout) {
 			$scope.actionTimeout = $scope.table.maxActionTimeout;
 		}
-		$scope.actionTimer = setTimeout($scope.remindAction, $scope.actionTimeout);
-		$scope.kickTimer = setTimeout($scope.leaveTable,120000);
 	}
 
 	// When the table data have changed

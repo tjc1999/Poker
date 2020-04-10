@@ -608,7 +608,7 @@ Table.prototype.playerBetted = function( amount ) {
 	this.public.biggestBet = this.public.biggestBet < this.seats[this.public.activeSeat].public.bet ? this.seats[this.public.activeSeat].public.bet : this.public.biggestBet;
 
 	this.log({
-		message: this.seats[this.public.activeSeat].public.name + ' betted ' + amount,
+		message: this.seats[this.public.activeSeat].public.name + ' bet ' + amount,
 		action: 'bet',
 		seat: this.public.activeSeat,
 		notification: 'Bet ' + amount
@@ -698,17 +698,25 @@ Table.prototype.playerSatIn = function( seat ) {
  * @param int seat
  */
 Table.prototype.playerLeft = function( seat ) {
-	this.log({
-		message: this.seats[seat].public.name + ' left',
-		action: '',
-		seat: '',
-		notification: ''
-	});
-
 	// If someone is really sitting on that seat
 	if( this.seats[seat].public.name ) {
 		var nextAction = '';
-
+		
+		// If they are small/big blind, post first
+		console.log(this.public.phase);
+		if(this.public.phase == "smallBlind"){
+			this.playerPostedSmallBlind();
+		}else if(this.public.phase == "bigBlind"){
+			this.playerPostedBigBlind(); 
+		}
+		
+		this.log({
+			message: this.seats[seat].public.name + ' left with '+this.seats[seat].public.chipsInPlay+' chips',
+			action: '',
+			seat: '',
+			notification: ''
+		});
+		
 		// If the player is sitting in, make them sit out first
 		if( this.seats[seat].public.sittingIn ) {
 			this.playerSatOut( seat, true );

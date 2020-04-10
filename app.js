@@ -132,6 +132,8 @@ io.sockets.on('connection', function( socket ) {
 			var seat = players[socket.id].seat;
 			// The table on which the player was sitting
 			var tableId = players[socket.id].sittingOnTable;
+			// Post the blind
+
 			// Remove the player from the seat
 			tables[tableId].playerLeft( seat );
 			// Send the number of total chips back to the user
@@ -317,16 +319,18 @@ io.sockets.on('connection', function( socket ) {
 	 * @param function callback
 	 */
 	socket.on('call', function( callback ){
-		if( players[socket.id].sittingOnTable !== 'undefined' ) {
-			var tableId = players[socket.id].sittingOnTable;
-			var activeSeat = tables[tableId].public.activeSeat;
+		try{
+			if( players[socket.id].sittingOnTable !== 'undefined' ) {
+				var tableId = players[socket.id].sittingOnTable;
+				var activeSeat = tables[tableId].public.activeSeat;
 
-			if( tables[tableId] && tables[tableId].seats[activeSeat].socket.id === socket.id && tables[tableId].public.biggestBet && ['preflop','flop','turn','river'].indexOf(tables[tableId].public.phase) > -1 ) {
-				// Sending the callback first, because the next functions may need to send data to the same player, that shouldn't be overwritten
-				callback( { 'success': true } );
-				tables[tableId].playerCalled();
+				if( tables[tableId] && tables[tableId].seats[activeSeat].socket.id === socket.id && tables[tableId].public.biggestBet && ['preflop','flop','turn','river'].indexOf(tables[tableId].public.phase) > -1 ) {
+					// Sending the callback first, because the next functions may need to send data to the same player, that shouldn't be overwritten
+					callback( { 'success': true } );
+					tables[tableId].playerCalled();
+				}
 			}
-		}
+		}catch(e){}
 	});
 
 	/**
@@ -453,5 +457,6 @@ function htmlEntities(str) {
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-tables[0] = new Table( 0, 'Tournament Table for 10', eventEmitter(0), 10, 200, 100, 640000, 100, false, [100,200,300,400,500,700,1000,1500,2000,2500,5000,10000], 10000, 30000, 30000 );
-tables[1] = new Table( 1, 'Table for 10', eventEmitter(1), 10, 200, 100, 32000, 32000, false, 30000, 120000 );
+tables[0] = new Table( 0, 'Tournament Table A for 10', eventEmitter(0), 10, 200, 100, 640000, 100, false, [100,200,300,400,500,700,1000,1500,2000,2500,5000,10000], 10000, 30000, 30000 );
+tables[1] = new Table( 1, 'Tournament Table B for 10', eventEmitter(1), 10, 200, 100, 640000, 100, false, [100,200,300,400,500,700,1000,1500,2000,2500,5000,10000], 10000, 30000, 30000 );
+tables[2] = new Table( 2, 'Table for 10', eventEmitter(2), 10, 200, 100, 32000, 32000, false, 30000, 120000 );
