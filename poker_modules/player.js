@@ -44,6 +44,7 @@ var Player = function( socket, name, chips ) {
 Player.prototype.leaveTable = function() {
 	if( this.sittingOnTable !== false ) {
 		this.sitOut();
+		this.cards = [];
 		// Remove the chips from play
 		this.chips += this.public.chipsInPlay;
 		this.public.chipsInPlay = 0;
