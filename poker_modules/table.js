@@ -79,6 +79,8 @@ var Table = function( id, name, eventEmitter, seatsCount, bigBlind, smallBlind, 
 		phase: null,
 		// The cards on the board
 		board: ['', '', '', '', ''],
+		// Chip history
+		chipHistory: {},
 		// Log of an action, displayed in the chat
 		log: {
 			message: '',
@@ -91,7 +93,8 @@ var Table = function( id, name, eventEmitter, seatsCount, bigBlind, smallBlind, 
 		this.seats[i] = null;
 	}
 };
-
+console.log("table.public");
+console.log(this.public);
 // The function that emits the events of the table
 Table.prototype.emitEvent = function( eventName, eventData ){
 	this.eventEmitter( eventName, eventData );
@@ -703,13 +706,15 @@ Table.prototype.playerLeft = function( seat ) {
 		var nextAction = '';
 		
 		// If they are small/big blind, post first
-		console.log(this.public.phase);
 		if(this.public.phase == "smallBlind"){
 			this.playerPostedSmallBlind();
 		}else if(this.public.phase == "bigBlind"){
 			this.playerPostedBigBlind(); 
 		}
-		
+		// Save users chip history
+		this.public.chipHistory[this.seats[seat].public.name] = parseInt(this.seats[seat].public.chipsInPlay);
+		this.emitEvent( 'table-data', this.public );		
+				
 		this.log({
 			message: this.seats[seat].public.name + ' left with '+this.seats[seat].public.chipsInPlay+' chips',
 			action: '',
@@ -721,7 +726,8 @@ Table.prototype.playerLeft = function( seat ) {
 		if( this.seats[seat].public.sittingIn ) {
 			this.playerSatOut( seat, true );
 		}
-
+		
+		this.seats[seat].cards = [];
 		this.seats[seat].leaveTable();
 
 		// Empty the seat
@@ -852,7 +858,7 @@ Table.prototype.endRound = function() {
 
 	// Sitting out the players who don't have chips
 	for( i=0 ; i<this.public.seatsCount ; i++ ) {
-		if( this.seats[i] !== null && this.seats[i].public.chipsInPlay <=0 && this.seats[i].public.sittingIn ) {
+		if( this.seats[i] !== null && this.seats[i].public.chipsInPlay <=0 ) {
 			this.seats[i].sitOut();
 			this.seats[i].cards = [];
 			this.seats[i].public.hasCards = false;
