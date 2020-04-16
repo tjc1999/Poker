@@ -38,6 +38,7 @@
 			<seat player="table.seats[9]" active-seat="table.activeSeat" dealer-seat="table.dealerSeat" my-seat="mySeat" my-cards="myCards" sitting-on-table="$root.sittingOnTable" show-buy-in-modal="showBuyInModal(seat)" notifications="notifications" seat-index="9" cell-number="9"></seat>
 		</div>
 		<div class="double-cell">
+			<button id="start-game" class="control-button" ng-show="$root.sittingOnTable !== null && table.dealerSeat == null" ng-click="startGame()">Start Game</button>
 			<div id="pot-wrap">
 				<span id="pot" ng-show="table.pot[0].amount">{{potText()}}</span>
 			</div>
@@ -121,6 +122,5 @@
 		<audio id="call-sound" src="/audio/call.wav" preload="auto">
 		<audio id="bet-sound" src="/audio/bet.wav" preload="auto">
 		<audio id="raise-sound" src="/audio/raise.wav" preload="auto">
-		<audio id="turn-sound" src="/audio/turnBell.wav" preload="auto">
 	</div>
 </div>

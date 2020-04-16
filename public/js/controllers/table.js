@@ -302,11 +302,23 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 	}
 
 	$scope.remindAction = function() {
-		sounds.playActionReminderSound();
+		//sounds.playActionReminderSound();
 		$scope.actionTimeout *= 2;
 		if ($scope.actionTimeout > $scope.table.maxActionTimeout) {
 			$scope.actionTimeout = $scope.table.maxActionTimeout;
 		}
+	}
+	
+	$scope.startGame = function() {
+		socket.emit( 'startGame', function( response ) {
+			if( response.success ) {
+				$scope.startGameVisible = false;
+				$scope.$digest();
+			}else{
+				$scope.startGameVisible = true;
+				$scope.$digest();
+			}
+		});
 	}
 
 	// When the table data have changed

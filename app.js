@@ -127,18 +127,20 @@ io.sockets.on('connection', function( socket ) {
 	 */
 	socket.on('leaveTable', function( callback ) {
 		// If the player was sitting on a table
-		if( players[socket.id].sittingOnTable !== false && tables[players[socket.id].sittingOnTable] !== false ) {
-			// The seat on which the player was sitting
-			var seat = players[socket.id].seat;
-			// The table on which the player was sitting
-			var tableId = players[socket.id].sittingOnTable;
-			//Save chip data if their connection was lost
-			tables[tableId].public.chipHistory[players[socket.id].public.name] = players[socket.id].public.chipsInPlay;
-			// Remove the player from the seat
-			tables[tableId].playerLeft( seat );
-			// Send the number of total chips back to the user
-			callback( { 'success': true, 'totalChips': players[socket.id].chips } );
-		}
+		try{
+			if( players[socket.id].sittingOnTable !== false && tables[players[socket.id].sittingOnTable] !== false ) {
+				// The seat on which the player was sitting
+				var seat = players[socket.id].seat;
+				// The table on which the player was sitting
+				var tableId = players[socket.id].sittingOnTable;
+				//Save chip data if their connection was lost
+				tables[tableId].public.chipHistory[players[socket.id].public.name] = players[socket.id].public.chipsInPlay;
+				// Remove the player from the seat
+				tables[tableId].playerLeft( seat );
+				// Send the number of total chips back to the user
+				callback( { 'success': true, 'totalChips': players[socket.id].chips } );
+			}
+		}catch(e){}
 	});
 
 	/**
@@ -395,7 +397,15 @@ io.sockets.on('connection', function( socket ) {
 			}
 		}
 	});
-
+	
+	socket.on('startGame', function( callback ) {
+		var tableId = players[socket.id].sittingOnTable;
+		tables[tableId].initializeRound( false );
+		if(tables[tableId].gameIsOn == true){
+			callback( { 'success': true } );
+		}
+	});
+	
   /**
    * When a player goes all in
    * @param function callback

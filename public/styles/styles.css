@@ -55,12 +55,23 @@ input[type="submit"].control-button.small,
 .button.control-button.small {
   font-size: 1em;
 }
+button#start-game {
+  position: absolute;
+  left: 40%;
+  top: 45%;
+  padding: 10px;
+  height: initial;
+  width: initial;
+}
 h1,
 h2,
 h3,
 h4,
 h5 {
   margin-top: 0;
+}
+h1 {
+  text-align: center;
 }
 a {
   text-decoration: none;
@@ -582,14 +593,14 @@ div#board-wrap .card-container {
   position: absolute;
   top: 2%;
 }
-#increase-blind {
-	right: 2%;
-}
 #to-lobby {
-	left: 2%;
+  left: 2%;
+}
+#increase-blind {
+  right: 2%;
 }
 #current-blinds {
-	text-align: center;
+  text-align: center;
 }
 .modal-wrap {
   position: absolute;
