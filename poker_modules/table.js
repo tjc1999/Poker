@@ -437,7 +437,8 @@ Table.prototype.showdown = function() {
 		currentPlayer = this.findNextPlayer( currentPlayer );
 	}
 	
-	var messages = this.pot.destributeToWinners( this.seats, currentPlayer );
+	var [messages,winners] = this.pot.destributeToWinners( this.seats, currentPlayer );
+	this.emitEvent( 'celebrate' , winners );
 
 	var messagesCount = messages.length;
 	for( var i=0 ; i<messagesCount ; i++ ) {

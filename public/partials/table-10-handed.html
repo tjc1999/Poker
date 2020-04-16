@@ -38,7 +38,7 @@
 			<seat player="table.seats[9]" active-seat="table.activeSeat" dealer-seat="table.dealerSeat" my-seat="mySeat" my-cards="myCards" sitting-on-table="$root.sittingOnTable" show-buy-in-modal="showBuyInModal(seat)" notifications="notifications" seat-index="9" cell-number="9"></seat>
 		</div>
 		<div class="double-cell">
-			<button id="start-game" class="control-button" ng-show="$root.sittingOnTable !== null && table.dealerSeat == null" ng-click="startGame()">Start Game</button>
+			<button id="start-game" class="control-button" ng-show="$root.sittingOnTable !== null && table.dealerSeat == null && table.playersSeatedCount > 1" ng-click="startGame()">Start Game</button>
 			<div id="pot-wrap">
 				<span id="pot" ng-show="table.pot[0].amount">{{potText()}}</span>
 			</div>

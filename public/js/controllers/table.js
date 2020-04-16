@@ -286,7 +286,6 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 	}
 	
 	$scope.setActionReminder = function() {
-		sounds.playTurnSound();
 		if ($scope.table.minActionTimeout) {
 			$scope.actionTimeout = $scope.table.minActionTimeout;
 			$scope.actionTimer = setTimeout($scope.remindAction, $scope.actionTimeout);
@@ -417,5 +416,22 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 		$scope.actionState = 'actOthersAllIn';
 		$scope.setActionReminder();
 		$scope.$digest();
+	});
+	
+	// When the user is asked to call an all in
+	socket.on( 'celebrate', function( playerSeat ) {
+		try{
+			if(angular.isArray(playerSeat)){
+				for(i=0; i<playerSeat.length; i++){
+					var winnerSeat = document.querySelector("[cell-number='"+playerSeat[i]+"']");
+					angular.element( winnerSeat ).parent().addClass('winner');
+					$timeout(function(){angular.element( winnerSeat ).parent().removeClass('winner');},20000);
+				}
+			}else{
+				var winnerSeat = document.querySelector("[cell-number='"+playerSeat+"']");
+				angular.element( winnerSeat ).parent().addClass('winner');
+				$timeout(function(){angular.element( winnerSeat ).parent().removeClass('winner');},20000);
+			}
+		}catch(e){}
 	});
 }]);

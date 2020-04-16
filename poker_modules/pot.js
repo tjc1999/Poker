@@ -204,7 +204,7 @@ Pot.prototype.destributeToWinners = function(players, firstPlayerToAct) {
 
   this.reset();
 
-  return messages;
+  return [messages,winners];
 };
 
 /**
