@@ -132,8 +132,8 @@ io.sockets.on('connection', function( socket ) {
 			var seat = players[socket.id].seat;
 			// The table on which the player was sitting
 			var tableId = players[socket.id].sittingOnTable;
-			// Post the blind
-
+			//Save chip data if their connection was lost
+			tables[tableId].public.chipHistory[players[socket.id].public.name] = players[socket.id].public.chipsInPlay;
 			// Remove the player from the seat
 			tables[tableId].playerLeft( seat );
 			// Send the number of total chips back to the user
@@ -250,30 +250,32 @@ io.sockets.on('connection', function( socket ) {
 	 * @param function callback
 	 */
 	socket.on('postBlind', function( postedBlind, callback ) {
-		if( players[socket.id].sittingOnTable !== false ) {
-			var tableId = players[socket.id].sittingOnTable;
-			var activeSeat = tables[tableId].public.activeSeat;
+		try{
+			if( players[socket.id].sittingOnTable !== false ) {
+				var tableId = players[socket.id].sittingOnTable;
+				var activeSeat = tables[tableId].public.activeSeat;
 
-			if( tables[tableId] 
-				&& typeof tables[tableId].seats[activeSeat].public !== 'undefined' 
-				&& tables[tableId].seats[activeSeat].socket.id === socket.id 
-				&& ( tables[tableId].public.phase === 'smallBlind' || tables[tableId].public.phase === 'bigBlind' ) 
-			) {
-				if( postedBlind ) {
-					callback( { 'success': true } );
-					if( tables[tableId].public.phase === 'smallBlind' ) {
-						// The player posted the small blind
-						tables[tableId].playerPostedSmallBlind();
+				if( tables[tableId] 
+					&& typeof tables[tableId].seats[activeSeat].public !== 'undefined' 
+					&& tables[tableId].seats[activeSeat].socket.id === socket.id 
+					&& ( tables[tableId].public.phase === 'smallBlind' || tables[tableId].public.phase === 'bigBlind' ) 
+				) {
+					if( postedBlind ) {
+						callback( { 'success': true } );
+						if( tables[tableId].public.phase === 'smallBlind' ) {
+							// The player posted the small blind
+							tables[tableId].playerPostedSmallBlind();
+						} else {
+							// The player posted the big blind
+							tables[tableId].playerPostedBigBlind();
+						}
 					} else {
-						// The player posted the big blind
-						tables[tableId].playerPostedBigBlind();
+						tables[tableId].playerSatOut( players[socket.id].seat );
+						callback( { 'success': true } );
 					}
-				} else {
-					tables[tableId].playerSatOut( players[socket.id].seat );
-					callback( { 'success': true } );
 				}
 			}
-		}
+		}catch(e){}
 	});
 
 	/**
@@ -302,16 +304,18 @@ io.sockets.on('connection', function( socket ) {
 	 * @param function callback
 	 */
 	socket.on('fold', function( callback ){
-		if( players[socket.id].sittingOnTable !== false ) {
-			var tableId = players[socket.id].sittingOnTable;
-			var activeSeat = tables[tableId].public.activeSeat;
+		try{
+			if( players[socket.id].sittingOnTable !== false ) {
+				var tableId = players[socket.id].sittingOnTable;
+				var activeSeat = tables[tableId].public.activeSeat;
 
-			if( tables[tableId] && tables[tableId].seats[activeSeat].socket.id === socket.id && ['preflop','flop','turn','river'].indexOf(tables[tableId].public.phase) > -1 ) {
-				// Sending the callback first, because the next functions may need to send data to the same player, that shouldn't be overwritten
-				callback( { 'success': true } );
-				tables[tableId].playerFolded();
+				if( tables[tableId] && tables[tableId].seats[activeSeat].socket.id === socket.id && ['preflop','flop','turn','river'].indexOf(tables[tableId].public.phase) > -1 ) {
+					// Sending the callback first, because the next functions may need to send data to the same player, that shouldn't be overwritten
+					callback( { 'success': true } );
+					tables[tableId].playerFolded();
+				}
 			}
-		}
+		}catch(e){}
 	});
 
 	/**
@@ -339,6 +343,7 @@ io.sockets.on('connection', function( socket ) {
 	 * @param function callback
 	 */
 	socket.on('bet', function( amount, callback ){
+		try{
 		if( players[socket.id].sittingOnTable !== 'undefined' ) {
 			var tableId = players[socket.id].sittingOnTable;
 			var activeSeat = tables[tableId].public.activeSeat;
@@ -353,6 +358,7 @@ io.sockets.on('connection', function( socket ) {
 				}
 			}
 		}
+		}catch(e){}
 	});
 
 	/**
