@@ -30,6 +30,13 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 	}).success(function( data, status, headers, config ) {
 		$scope.table = data.table;
 		$scope.buyInAmount = 32000; //$rootScope.totalChips
+		// If their connection was lost restore chip amount
+		try{
+			if($scope.table.chipHistory[$rootScope.screenName] != null){
+				$scope.buyInAmount = parseInt($scope.table.chipHistory[$rootScope.screenName]);
+			}
+		}catch(e){}
+
 		$scope.betAmount = data.table.bigBlind;
 	});
 
@@ -279,6 +286,7 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 	}
 	
 	$scope.setActionReminder = function() {
+		sounds.playTurnSound();
 		if ($scope.table.minActionTimeout) {
 			$scope.actionTimeout = $scope.table.minActionTimeout;
 			$scope.actionTimer = setTimeout($scope.remindAction, $scope.actionTimeout);
