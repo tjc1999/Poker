@@ -90,7 +90,6 @@
 		<div class="cell">
 			<button class="control-button" ng-click="fold()" ng-show="showFoldButton()">Fold</button>
 			<!--<button class="control-button" ng-click="postBlind(false)" ng-show="actionState === 'postSmallBlind' || actionState === 'postBigBlind'">Sit Out</button>-->
-			<button class="control-button" ng-click="leaveTable()" ng-show="showLeaveTableButton() || !player.sittingIn && actionState == ''">Leave Table</button>
 		</div>
 		<div class="cell">
 			<button class="control-button" ng-click="sitIn()" ng-show="$root.sittingOnTable !== null && !$root.sittingIn">Sit In</button>
@@ -106,6 +105,9 @@
 		<div class="cell">
 			<button class="control-button" ng-click="allIn()" ng-show="showAllInButton()">All-In {{maxBetAmount()}}</button>
 		</div>
+		<div class="cell" ng-show="showLeaveTableButton() || !player.sittingIn && actionState == ''">
+			<button class="control-button" ng-click="leaveTable()">Leave Table</button>
+		</div>
 		<div class="double-cell">
 			<div class="cell-content">
 				<input type="range" ng-show="showBetRange()" min="{{minBetAmount()}}" max="{{maxBetAmount()}}" ng-model="betAmount">
@@ -119,6 +121,6 @@
 		<audio id="call-sound" src="/audio/call.wav" preload="auto">
 		<audio id="bet-sound" src="/audio/bet.wav" preload="auto">
 		<audio id="raise-sound" src="/audio/raise.wav" preload="auto">
-		<audio id="actionReminder-sound" src="/audio/actionReminder.wav" preload="auto">
+		<audio id="turn-sound" src="/audio/turnBell.wav" preload="auto">
 	</div>
 </div>
