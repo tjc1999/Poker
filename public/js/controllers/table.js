@@ -16,7 +16,6 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 	$scope.betAmount = 0;
 	$scope.actionTimeout = 0;
 	$scope.actionTimer = null;
-	$scope.kickTimer = null;
 	$rootScope.sittingOnTable = null;
 	var showingNotification = false;
 
@@ -301,7 +300,7 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 	}
 
 	$scope.remindAction = function() {
-		//sounds.playActionReminderSound();
+		sounds.playActionReminderSound();
 		$scope.actionTimeout *= 2;
 		if ($scope.actionTimeout > $scope.table.maxActionTimeout) {
 			$scope.actionTimeout = $scope.table.maxActionTimeout;
@@ -374,14 +373,14 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 	// When the player is asked to place the small blind
 	socket.on( 'postSmallBlind', function( data ) {
 		$scope.actionState = 'postSmallBlind';
-		$scope.setActionReminder();
+		$scope.postBlind(true);
 		$scope.$digest();
 	});
 
 	// When the player is asked to place the big blind
 	socket.on( 'postBigBlind', function( data ) {
 		$scope.actionState = 'postBigBlind';
-		$scope.setActionReminder();
+		$scope.postBlind(true);
 		$scope.$digest();
 	});
 
@@ -425,7 +424,12 @@ function( $scope, $rootScope, $http, $routeParams, $timeout, sounds ) {
 				for(i=0; i<playerSeat.length; i++){
 					var winnerSeat = document.querySelector("[cell-number='"+playerSeat[i]+"']");
 					angular.element( winnerSeat ).parent().addClass('winner');
-					$timeout(function(){angular.element( winnerSeat ).parent().removeClass('winner');},20000);
+					$timeout(function(){
+						for(j=0; j<10; j++){
+							var innerwinnerSeat = document.querySelector("[cell-number='"+playerSeat[j]+"']");
+							angular.element( innerwinnerSeat ).parent().removeClass('winner');
+						}
+					},20000);
 				}
 			}else{
 				var winnerSeat = document.querySelector("[cell-number='"+playerSeat+"']");

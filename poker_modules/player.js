@@ -75,6 +75,7 @@ Player.prototype.sitOnTable = function( tableId, seat, chips ) {
  */
 Player.prototype.sitOut = function() {
 	if( this.sittingOnTable !== false ) {
+		this.public.hasCards = false;
 		this.public.sittingIn = false;
 		this.public.inHand = false;
 	}

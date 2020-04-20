@@ -93,8 +93,7 @@ var Table = function( id, name, eventEmitter, seatsCount, bigBlind, smallBlind, 
 		this.seats[i] = null;
 	}
 };
-console.log("table.public");
-console.log(this.public);
+
 // The function that emits the events of the table
 Table.prototype.emitEvent = function( eventName, eventData ){
 	this.eventEmitter( eventName, eventData );
@@ -228,7 +227,6 @@ Table.prototype.initializeRound = function( changeDealer ) {
 		this.headsUp = this.playersSittingInCount === 2;
 		this.playersInHandCount = 0;
 		this.public.biggestBet = 0;
-		console.log(this.public.seats);
 
 		for( var i=0 ; i<this.public.seatsCount ; i++ ) {
 			// If a player is sitting on the current seat
@@ -866,6 +864,7 @@ Table.prototype.endRound = function() {
 			this.playersSittingInCount--;
 		}
 	}
+	console.log(this.public.seats);
 
 	// If there are not enough players to continue the game, stop it
 	if( this.playersSittingInCount < 2 ) {
